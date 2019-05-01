@@ -86,16 +86,16 @@ class DiagramFlow {
         // 認識した結果が最終結果なら
         if (results.isFinal) {
           resolve(results[0].transcript)
-        } else {
+        // } else {
           // 認識途中なら相槌を打つ
-          if (!this.isAizuti) {
-            if (Math.random() > 0.8) {
-              this.isAizuti = true
-              this.aizutiAudio.play().then(() => {
-                this.isAizuti = false
-              })
-            }
-          }
+          // if (!this.isAizuti) {
+          //   if (Math.random() > 0.8) {
+          //     this.isAizuti = true
+          //     this.aizutiAudio.play().then(() => {
+          //       this.isAizuti = false
+          //     })
+          //   }
+          // }
         }
       }
       this.recognition_.onerror = (e) => {

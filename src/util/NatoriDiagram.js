@@ -48,7 +48,7 @@ class NatoriDiagram {
     // あげていくぞ
     this.diagramFlow.append('天才', _ageage)
     this.diagramFlow.append('いけそう', _ageage)
-    this.diagramFlow.append('よさそう', _ageage)
+    // this.diagramFlow.append('よさそう', _ageage)
     this.diagramFlow.append('良さそう', _ageage)
     this.diagramFlow.append('行けそう', _ageage)
     this.diagramFlow.append('いける', _ageage)
