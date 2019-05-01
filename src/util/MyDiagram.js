@@ -103,7 +103,6 @@ class DiagramFlow {
         else reject(e)
       }
     })
-    console.log(res)
     return res
   }
   // 音声認識が終了した時
