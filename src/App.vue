@@ -3,26 +3,14 @@
     <div id="nav">
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link>
-      <button @click.end="button">start</button>
     </div>
     <router-view/>
   </div>
 </template>
 
 <script>
-import NatoriDiagram from '@/util/NatoriDiagram.js'
 export default {
-  name: 'app',
-  data () {
-    return {
-      natoriDiagram: new NatoriDiagram()
-    }
-  },
-  methods: {
-    button () {
-      this.$data.natoriDiagram.start()
-    }
-  }
+  name: 'app'
 }
 </script>
 
