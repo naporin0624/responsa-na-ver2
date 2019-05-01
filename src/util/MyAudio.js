@@ -1,60 +1,87 @@
-class AudioQue {
-  constructor () {
+const type = Object.prototype.toString
+class AudioWithList {
+  constructor (payload) {
     this.audio_ = new Audio()
-    this.audioQue_ = []
-    this.isPlay = false
+    this.isStart_ = false
+    // 再生リストをためておくやつ
+    this.audioList_ = []
+    this.append(payload)
   }
-  append (url) {
-    if (url === '' && url === null && url === undefined) {
-      console.log('error')
-      return null
-    } else {
-      this.audioQue_.push(url)
+  // url: strをリストに追加する
+  _appendStr (url) {
+    if (url !== undefined && url !== null && url !== '') {
+      this.audioList_.push(url)
     }
   }
-  async playContinue () {
-    let states = false
-    let idx = 0
-    while (this.audioQue_.length !== idx) {
-      states = this.play(idx)
-      idx++
-      if (!states) {
-        break
-      }
-      this.isPlay = true
-      await this.audioStopPromise()
-      this.isPlay = false
-    }
-    return new Promise((resolve, reject) => {
-      if (states) {
-        resolve(states)
-      } else {
-        reject(states)
-      }
-    })
+  // url: listをリストに追加する
+  _appendList (urlList) {
+    this.audioList_ = this.audioList_.concat(urlList)
   }
-  play (idx) {
-    if (!this.isPlay) {
-      this.audio_.src = this.audioQue_[idx]
-      this.audio_.play()
-      return true
-    } else {
-      return false
+  append (payload) {
+    if (type.call(payload) === type.call('')) {
+      this._appendStr(payload)
+    } else if (type.call(payload) === type.call([])) {
+      this._appendList(payload)
     }
   }
-  parse () {
-    if (this.isPlay) {
+  play () {
+
+  }
+  pause () {
+    if (this.isStart_) {
       this.audio_.pause()
-      this.isPlay = false
+      this.isStart_ = false
     }
   }
-  audioStopPromise () {
-    return new Promise((resolve, reject) => {
+  audioOnendPromise () {
+    const p = new Promise((resolve, reject) => {
       this.audio_.addEventListener('ended', () => {
-        resolve('OK')
+        resolve()
       })
     })
+    return p
   }
 }
 
-export default AudioQue
+class AudioQue extends AudioWithList {
+  async _play (url) {
+    this.audio_.src = url
+    this.audio_.play()
+  }
+  async play () {
+    let p = []
+    if (!this.isStart_) {
+      this.isStart_ = true
+      for (let idx in this.audioList_) {
+        this.audio_.src = this.audioList_[idx]
+        this.audio_.play()
+        let _p = await this.audioOnendPromise()
+        this.audio_ = new Audio()
+        p.push(_p)
+      }
+    }
+    this.isStart_ = false
+    return Promise.all(p)
+  }
+}
+
+class AudioRandom extends AudioWithList {
+  async play () {
+    let stat = null
+    if (!this.isStart_ && this.audioList_.length > 0) {
+      const url = this.fetchRandomFromList(this.audioList_)
+      this.isStart_ = true
+      this.audio_.src = url
+      this.audio_.play()
+      stat = await this.audioOnendPromise()
+      this.isStart_ = false
+    }
+    return Promise.resolve(stat)
+  }
+  fetchRandomFromList (audioList) {
+    const idx = Math.floor(Math.random() * audioList.length)
+    return audioList[idx]
+  }
+}
+
+export { AudioWithList, AudioQue, AudioRandom }
