@@ -42,20 +42,14 @@ class DiagramFlow {
     let promiseList = []
     this.recognition_.start()
     // 認識結果を返す
-    console.log('認識中')
     const userInputVoice = await this.recognitionResultPromise()
-    console.log('認識終了')
     promiseList.push(userInputVoice)
     console.log(userInputVoice)
-    // 認識終了
-    console.log('認識終了')
     // 認識結果に対して名取がしゃべりだす
-    console.log('喋るかも')
     if (userInputVoice !== '') {
       const _p = await this.natoriUttr(userInputVoice)
       promiseList.push(_p)
     }
-    console.log('喋り終わり')
     return Promise.all(promiseList)
   }
   async natoriUttr (recognitionText) {
@@ -95,10 +89,12 @@ class DiagramFlow {
         } else {
           // 認識途中なら相槌を打つ
           if (!this.isAizuti) {
-            this.isAizuti = true
-            this.aizutiAudio.play().then(() => {
-              this.isAizuti = false
-            })
+            if (Math.random() > 0.8) {
+              this.isAizuti = true
+              this.aizutiAudio.play().then(() => {
+                this.isAizuti = false
+              })
+            }
           }
         }
       }
