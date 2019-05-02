@@ -1,6 +1,12 @@
 /* eslint-disable no-undef */
-import { AudioWithList, AudioRandom } from '@/util/MyAudio.js'
-import { hunhun, unnunn } from '@/resource/aizuti.js'
+import {
+  AudioWithList,
+  AudioRandom
+} from '@/util/MyAudio.js'
+import {
+  hunhun,
+  unnunn
+} from '@/resource/aizuti.js'
 import levenshtein from 'js-levenshtein'
 
 class DiagramFlow {
@@ -28,14 +34,22 @@ class DiagramFlow {
   }
   // これを実行するとはじまる
   play () {
-    // 単語辞書登録してみたけどダメそう
-    const grammar = '#JSGF V1.0; grammar words; public <words> = ' + Object.keys(this.hookWord).join(' | ') + ' ;'
-    this.grammarList.addFromString(grammar, 1)
-    this.recognition_.grammar = this.grammarList
-    // 会話プログラムの開始
-    this._play()
-    this.recognition_.onend = () => {
-      this._play()
+    if (this.recognition_) {
+      // 単語辞書登録してみたけどダメそう
+      const grammar = '#JSGF V1.0; grammar words; public <words> = ' + Object.keys(this.hookWord).join(' | ') + ' ;'
+      this.grammarList.addFromString(grammar, 1)
+      this.recognition_.grammar = this.grammarList
+      // 会話プログラムの開始
+      this._play().then((res) => {
+        console.log(res)
+      })
+      this.recognition_.onend = () => {
+        this._play().then((res) => {
+          console.log(res)
+        })
+      }
+    } else {
+      alert('だめっぽいよ')
     }
   }
   async _play () {
@@ -44,7 +58,6 @@ class DiagramFlow {
     // 認識結果を返す
     const userInputVoice = await this.recognitionResultPromise()
     promiseList.push(userInputVoice)
-    console.log(userInputVoice)
     // 認識結果に対して名取がしゃべりだす
     if (userInputVoice !== '') {
       const _p = await this.natoriUttr(userInputVoice)
@@ -56,9 +69,9 @@ class DiagramFlow {
     let p = []
     for (let word in this.hookWord) {
       const proba = recognitionText.length / levenshtein(word, recognitionText)
-      console.log('word: ' + word + '  ' + proba + '%')
+      // console.log('word: ' + word + '  ' + proba)
       if (recognitionText.includes(word) || proba >= 3) {
-        console.log(this.hookWord[word])
+        // console.log(this.hookWord[word])
         // 相槌が行われていればそれを止める
         if (this.isAizuti) {
           this.aizutiAudio.pause()
@@ -86,7 +99,7 @@ class DiagramFlow {
         // 認識した結果が最終結果なら
         if (results.isFinal) {
           resolve(results[0].transcript)
-        // } else {
+          // } else {
           // 認識途中なら相槌を打つ
           // if (!this.isAizuti) {
           //   if (Math.random() > 0.8) {
